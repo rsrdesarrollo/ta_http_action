@@ -17,6 +17,7 @@ handler.setFormatter(formatter)
 logging.root.addHandler(handler)
 
 DEFAULT_REQUEST_TIMEOUT = 30
+DEFAUTL_REQUEST_METHOD = "post"
 DEFAULT_PAYLOAD = """"{
   "sid": "$sid$",
   "search_name": "$search_name$",
@@ -28,6 +29,9 @@ DEFAULT_PAYLOAD = """"{
 
 
 def render_template_with_context(template: str, context: dict):
+    if template is None:
+        return template
+
     for k, v in context.items():
         if type(v) == dict:
             v_obj = json.dumps(v)
@@ -44,26 +48,27 @@ def render_template_with_context(template: str, context: dict):
     return template
 
 
-def process(data):
-    configuration = data["configuration"]
-    session_key = data.get("session_key")
+def process(data: dict):
+    configuration: dict = data["configuration"]
+    session_key = data["session_key"]
 
     context = {
-        "sid": data.get("sid"),
-        "search_name": data.get("search_name"),
-        "app": data.get("app"),
-        "owner": data.get("owner"),
-        "results_link": data.get("results_link"),
-        "result": data.get("result"),
+        "sid": data["sid"],
+        "search_name": data["search_name"],
+        "app": data["app"],
+        "owner": data["owner"],
+        "results_link": data["results_link"],
+        "result": data["result"],
     }
 
-    endpoint = configuration.get("endpoint")
+    endpoint = configuration["endpoint"]
+
     payload = render_template_with_context(
         configuration.get("payload", DEFAULT_PAYLOAD), context=context
     )
-    method = configuration.get("method")
+    method = configuration.get("method", DEFAUTL_REQUEST_METHOD)
     qs_params = render_template_with_context(
-        configuration.get("qs_params"), context=context
+        configuration.get("qs_params", ""), context=context
     )
     custom_headers = render_template_with_context(
         configuration.get("custom_headers", "{}"), context=context

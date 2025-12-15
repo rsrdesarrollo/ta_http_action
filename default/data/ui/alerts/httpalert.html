@@ -1,95 +1,48 @@
-<form class="form-horizontal form-complex">
-  <div class="control-group">
-    <label class="control-label" for="httpalert_endpoint">
-      Endpoint <span class="required">*</span>
-    </label>
-    <div class="controls">
-      <input
-        type="text"
-        name="action.httpalert.param.endpoint"
-        id="httpalert_endpoint"
-      />
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="httpalert_method">
-      Method <span class="required">*</span>
-    </label>
-    <div class="controls">
-      <select name="action.httpalert.param.method" id="httpalert_method">
-        <option value="post">POST</option>
-        <option value="get">GET</option>
-        <option value="delete">DELETE</option>
-        <option value="patch">PATCH</option>
-        <option value="put">PUT</option>
-      </select>
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="httpalert_verify_ssl_certificate">
-      Verify SSL Certificate <span class="required">*</span>
-    </label>
-    <div class="controls">
-      <select
-        name="action.httpalert.param.verify_ssl_certificate"
-        id="httpalert_verify_ssl_certificate"
-      >
-        <option value="1">True</option>
-        <option value="0">False</option>
-      </select>
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="httpalert_credential">
-      Credentials
-    </label>
-    <div class="controls">
-      <splunk-search-dropdown
-        name="action.httpalert.param.credential"
-        id="httpalert_credential"
-        search='| rest /servicesNS/-/-/storage/passwords | search realm=httpalert | append [|makeresults | eval title="None", username="None (no auth)"]'
-        value-field="title"
-        label-field="username"
-      >
-      </splunk-search-dropdown>
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="httpalert_qs_params">
-      Querystring Params
-    </label>
-    <div class="controls">
-      <input
-        type="text"
-        name="action.httpalert.param.qs_params"
-        id="httpalert_qs_params"
-      />
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="httpalert_custom_headers">Headers</label>
-    <div class="controls">
-      <textarea
-        class="input-xlarge"
-        rows="4"
-        cols="40"
-        name="action.httpalert.param.custom_headers"
-        id="httpalert_headers"
-        placeholder='{"Content-Type": "application/json", "X-Custom-Header": "value"}'
-      ></textarea>
-      <span class="help-block">Enter headers as a JSON object with key-value pairs</span>
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="httpalert_payload"> Payload </label>
-    <div class="controls">
-      <textarea
-        class="input-xlarge"
-        rows="8"
-        cols="40"
-        name="action.httpalert.param.payload"
-        id="httpalert_payload"
-      ></textarea>
-    </div>
-  </div>
+<form>
+  <splunk-control-group label="Endpoint" help="The HTTP endpoint URL to send the alert to">
+    <splunk-text-input name="action.httpalert.param.endpoint" id="httpalert_endpoint">
+    </splunk-text-input>
+  </splunk-control-group>
+
+  <splunk-control-group label="Method" help="HTTP method to use for the request">
+    <splunk-select name="action.httpalert.param.method" id="httpalert_method">
+      <option value="post">POST</option>
+      <option value="get">GET</option>
+      <option value="delete">DELETE</option>
+      <option value="patch">PATCH</option>
+      <option value="put">PUT</option>
+    </splunk-select>
+  </splunk-control-group>
+
+  <splunk-control-group label="Verify SSL Certificate" help="Verify the SSL certificate of the endpoint">
+    <splunk-select name="action.httpalert.param.verify_ssl_certificate" id="httpalert_verify_ssl_certificate">
+      <option value="1">True</option>
+      <option value="0">False</option>
+    </splunk-select>
+  </splunk-control-group>
+
+  <splunk-control-group label="Credentials" help="Optional credentials for authentication. Configure credentials in the app setup page.">
+    <splunk-search-dropdown
+      name="action.httpalert.param.credential"
+      id="httpalert_credential"
+      search='| rest /servicesNS/-/-/storage/passwords | search realm=httpalert | append [|makeresults | eval username="None"] | fields username | dedup username'
+      value-field="username"
+      label-field="username">
+    </splunk-search-dropdown>
+  </splunk-control-group>
+
+  <splunk-control-group label="Querystring Params" help="Additional query string parameters (e.g., key1=value1&key2=value2)">
+    <splunk-text-input name="action.httpalert.param.qs_params" id="httpalert_qs_params">
+    </splunk-text-input>
+  </splunk-control-group>
+
+  <splunk-control-group label="Headers" help="Enter headers as a JSON object with key-value pairs">
+    <splunk-text-area name="action.httpalert.param.custom_headers" id="httpalert_custom_headers">
+    </splunk-text-area>
+  </splunk-control-group>
+
+  <splunk-control-group label="Payload" help="Request body to send with the alert">
+    <splunk-text-area name="action.httpalert.param.payload" id="httpalert_payload">
+    </splunk-text-area>
+  </splunk-control-group>
 </form>

@@ -20,7 +20,7 @@ def get_credential(name: str, session_key: str):
     Returns:
         dict: Credential data (type, username/password, token, or header info)
     """
-    url = f"https://localhost:8089/servicesNS/nobody/webhookmaster/storage/passwords/{name}"
+    url = f"https://localhost:8089/servicesNS/nobody/webhookmaster/storage/passwords/httpalert:{name}:"
 
     headers = {
         "Authorization": f"Splunk {session_key}",
