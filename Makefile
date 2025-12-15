@@ -49,6 +49,10 @@ package: clean build-ui
 	@find $(BUILD_DIR)/$(APP_NAME) -name "*.pyc" -delete
 	@find $(BUILD_DIR)/$(APP_NAME) -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 	@find $(BUILD_DIR)/$(APP_NAME) -name ".DS_Store" -delete 2>/dev/null || true
+	@find $(BUILD_DIR)/$(APP_NAME) -name ".gitignore" -delete 2>/dev/null || true
+	@find $(BUILD_DIR)/$(APP_NAME) -name ".git" -type d -exec rm -rf {} + 2>/dev/null || true
+	@find $(BUILD_DIR)/$(APP_NAME) -name ".*" -type f -delete 2>/dev/null || true
+	@find $(BUILD_DIR)/$(APP_NAME) -type d -name "__MACOSX" -exec rm -rf {} + 2>/dev/null || true
 	
 	# Create the tarball
 	@echo "Creating package..."
