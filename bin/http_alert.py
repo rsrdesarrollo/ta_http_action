@@ -181,7 +181,10 @@ def process(data: dict):
 
 if len(sys.argv) > 1 and sys.argv[1] == "--execute":
     data = json.load(sys.stdin)
-    process(data)
+    try:
+        process(data)
+    except Exception as ex:
+        logging.error(f"httpalert Job={data['sid']} unhandled-exception: {ex}.")
 
 
 if len(sys.argv) > 1 and sys.argv[1] == "--test":
