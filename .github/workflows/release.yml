@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: front-end/credentials-ui/package-lock.json
+      
+      - name: Extract version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+      - name: Build package
+        run: make package
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+      
+      - name: Get package filename
+        id: package_name
+        run: |
+          PACKAGE_FILE=$(ls dist/*.tar.gz | head -n 1)
+          echo "PACKAGE_FILE=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+          echo "PACKAGE_NAME=$(basename $PACKAGE_FILE)" >> $GITHUB_OUTPUT
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.package_name.outputs.PACKAGE_FILE }}
+          body: |
+            ## Release ${{ steps.get_version.outputs.VERSION }}
+            
+            ### Installation
+            Download the `.tar.gz` file and install it in your Splunk instance:
+            
+            ```bash
+            tar -xzf ta_http_action-${{ steps.get_version.outputs.VERSION }}.tar.gz -C $SPLUNK_HOME/etc/apps/
+            ```
+            
+            Then restart Splunk to load the app.
+            
+            ### Documentation
+            See [README.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for usage instructions.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

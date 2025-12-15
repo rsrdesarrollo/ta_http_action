@@ -2,7 +2,7 @@
 
 # App configuration
 APP_NAME = ta_http_action
-VERSION = 11.0.0
+VERSION ?= dev
 PACKAGE_NAME = $(APP_NAME)-$(VERSION).tar.gz
 BUILD_DIR = build
 DIST_DIR = dist
