@@ -1,4 +1,4 @@
-.PHONY: all clean package install
+.PHONY: all clean package install bump-patch bump-minor bump-major
 
 # App configuration
 APP_NAME = webhookmaster
@@ -101,6 +101,46 @@ docker-clean:
 	@docker-compose down -v
 	@echo "All Docker resources cleaned"
 
+# Version bumping targets
+CURRENT_VERSION = $(shell git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+VERSION_PARTS = $(subst ., ,$(subst v,,$(CURRENT_VERSION)))
+MAJOR = $(word 1,$(VERSION_PARTS))
+MINOR = $(word 2,$(VERSION_PARTS))
+PATCH = $(word 3,$(VERSION_PARTS))
+
+bump-patch:
+	@echo "Current version: $(CURRENT_VERSION)"
+	$(eval NEW_VERSION=v$(MAJOR).$(MINOR).$(shell echo $$(($(PATCH)+1))))
+	@echo "Bumping to: $(NEW_VERSION)"
+	@git add -A
+	@git commit -m "Bump version to $(NEW_VERSION)" || echo "No changes to commit"
+	@git push origin $$(git branch --show-current)
+	@git tag $(NEW_VERSION)
+	@git push origin $(NEW_VERSION)
+	@echo "Version bumped and pushed: $(NEW_VERSION)"
+
+bump-minor:
+	@echo "Current version: $(CURRENT_VERSION)"
+	$(eval NEW_VERSION=v$(MAJOR).$(shell echo $$(($(MINOR)+1))).0)
+	@echo "Bumping to: $(NEW_VERSION)"
+	@git add -A
+	@git commit -m "Bump version to $(NEW_VERSION)" || echo "No changes to commit"
+	@git push origin $$(git branch --show-current)
+	@git tag $(NEW_VERSION)
+	@git push origin $(NEW_VERSION)
+	@echo "Version bumped and pushed: $(NEW_VERSION)"
+
+bump-major:
+	@echo "Current version: $(CURRENT_VERSION)"
+	$(eval NEW_VERSION=v$(shell echo $$(($(MAJOR)+1))).0.0)
+	@echo "Bumping to: $(NEW_VERSION)"
+	@git add -A
+	@git commit -m "Bump version to $(NEW_VERSION)" || echo "No changes to commit"
+	@git push origin $$(git branch --show-current)
+	@git tag $(NEW_VERSION)
+	@git push origin $(NEW_VERSION)
+	@echo "Version bumped and pushed: $(NEW_VERSION)"
+
 # Show help
 help:
 	@echo "Splunk App Build System for $(APP_NAME)"
@@ -117,6 +157,11 @@ help:
 	@echo "  make docker-restart - Restart Splunk container"
 	@echo "  make docker-logs    - View Splunk logs"
 	@echo "  make docker-clean   - Remove container and volumes"
+	@echo ""
+	@echo "Version bumping targets:"
+	@echo "  make bump-patch - Bump patch version (x.x.X)"
+	@echo "  make bump-minor - Bump minor version (x.X.0)"
+	@echo "  make bump-major - Bump major version (X.0.0)"
 	@echo ""
 	@echo "Other:"
 	@echo "  make help     - Show this help message"
